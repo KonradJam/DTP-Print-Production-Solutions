@@ -44,7 +44,8 @@ When a PDF is passed to a Droplet, Acrobat automatically opens the file, runs th
 
 ### Prepare the Folder Structure
 Ensure your main project folder contains the following setup:
-    ```text
+    
+    ```
     [Main Project Folder]
     ├── Correct/          (Good PDFs will be moved here)
     ├── Hot_folder/       (Drop new client PDFs here)
@@ -53,6 +54,7 @@ Ensure your main project folder contains the following setup:
         ├── PdfDropletMonitor.ps1
         ├── Stop-PdfDropletMonitor.ps1
         └── droplet.exe  (You will generate this in Step 2)
+    ```
 
 ### Create the Acrobat Droplet
 1. Open **Adobe Acrobat Pro** and navigate to **Print Production > Preflight**.
@@ -88,8 +90,10 @@ You can run the script normally, but for a professional DTP workflow, it is best
 **Create a Silent Shortcut:**
 1. Right-click on your desktop (or inside your project folder) and select **New > Shortcut**.
 2. In the location box, paste the following command (adjust the path to match where your `.ps1` file is located):
+
    ```cmd
    powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Your\Path\To\Script\Start-Preflight.ps1"
+
 3. Name it "Start Preflight Monitor".
 4. Double-click this shortcut. The script will now monitor the hot folder completely in the background.
 
