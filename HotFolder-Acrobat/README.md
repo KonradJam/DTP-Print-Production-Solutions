@@ -44,15 +44,15 @@ When a PDF is passed to a Droplet, Acrobat automatically opens the file, runs th
 
 ### Prepare the Folder Structure
 Ensure your main project folder contains the following setup:
-```text
-[Main Project Folder]
- ├── Correct/          (Good PDFs will be moved here)
- ├── Hot_folder/       (Drop new client PDFs here)
- ├── Incorrect/        (Failed PDFs + text reports go here)
- └── Script/
-      ├── PdfDropletMonitor.ps1
-      ├── Stop-PdfDropletMonitor.ps1
-      └── droplet.exe  (You will generate this in Step 2)
+    ```text
+    [Main Project Folder]
+    ├── Correct/          (Good PDFs will be moved here)
+    ├── Hot_folder/       (Drop new client PDFs here)
+    ├── Incorrect/        (Failed PDFs + text reports go here)
+    └── Script/
+        ├── PdfDropletMonitor.ps1
+        ├── Stop-PdfDropletMonitor.ps1
+        └── droplet.exe  (You will generate this in Step 2)
 
 ### Create the Acrobat Droplet
 1. Open **Adobe Acrobat Pro** and navigate to **Print Production > Preflight**.
