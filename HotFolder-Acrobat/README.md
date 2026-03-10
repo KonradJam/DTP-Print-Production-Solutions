@@ -1,4 +1,4 @@
-# Acrobat Droplets & Hot Folder ⚙️📁
+# Acrobat Droplet & Hot Folder ⚙️📁
 
 **Automated Preflight & Sorting Workflow for Adobe Acrobat Pro**
 

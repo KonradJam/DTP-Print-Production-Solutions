@@ -27,7 +27,7 @@ The table below lists the currently developed projects. Since each tool may rely
 
 | Solution Name | Repository Link | Brief Description of Capabilities |
 | :--- | :--- | :--- |
-| **Acrobat Hot Folder & Droplets** | [📁 `/HotFolder-Acrobat`](./HotFolder-Acrobat) | A PowerShell script automating preflight checks. PDFs dropped into the Hot Folder are automatically processed and verified using Adobe Acrobat Pro droplets. |
+| **Acrobat Droplet & Hot Folder** | [📁 `/HotFolder-Acrobat`](./HotFolder-Acrobat) | A PowerShell script automating preflight checks. PDFs dropped into the Hot Folder are automatically processed and verified using Adobe Acrobat Pro droplets. |
 
 > **Best Practice Tip:** Navigate to the specific solution's folder and read its local `README.md` to learn how to deploy the tool in your specific work environment.
 
