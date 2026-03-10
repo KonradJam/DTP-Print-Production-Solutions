@@ -1,34 +1,25 @@
-# Get the directory where this script is located (e.g., Project_Root\Script)
+# Get the directory where this script is located
 $scriptFolder = $PSScriptRoot
-
-# Navigate one level up to the root project folder
 $parentFolder = Split-Path -Path $scriptFolder -Parent
 
-# Define relative paths based on the project structure
+# Define relative paths
 $dropletPath = Join-Path -Path $scriptFolder -ChildPath "droplet.exe"
 $watchFolder = Join-Path -Path $parentFolder -ChildPath "Hot_folder"
 
-# Validate that required directories and files exist
-if (-not (Test-Path $watchFolder)) { 
-    Write-Error "Watch folder not found: $watchFolder"
-    exit 
-}
-if (-not (Test-Path $dropletPath)) { 
-    Write-Error "Acrobat Droplet not found: $dropletPath"
-    exit 
-}
+if (-not (Test-Path $watchFolder)) { Write-Error "Watch folder not found: $watchFolder"; exit }
+if (-not (Test-Path $dropletPath)) { Write-Error "Acrobat Droplet not found: $dropletPath"; exit }
 
-# Initialize FileSystemWatcher
 $watcher = New-Object System.IO.FileSystemWatcher
 $watcher.Path = $watchFolder
 $watcher.Filter = "*.pdf"
 $watcher.EnableRaisingEvents = $true
 
-# Define the action to trigger on new file detection
 $action = {
     $filePath = $Event.SourceEventArgs.FullPath
+    $droplet = $Event.MessageData # Retrieving the droplet path safely from Event context
     
-    # Wait until the file is completely copied and no longer locked by the OS
+    Write-Host "`n[$(Get-Date -Format 'HH:mm:ss')] New file detected: $(Split-Path $filePath -Leaf)"
+    
     $locked = $true
     $retryCount = 0
     
@@ -43,26 +34,30 @@ $action = {
         }
     }
 
-    # Execute Acrobat Droplet if the file is unlocked and ready
     if (-not $locked) {
-        Start-Process -FilePath $dropletPath -ArgumentList "`"$filePath`"" -WindowStyle Hidden -Wait
+        Write-Host "[$(Get-Date -Format 'HH:mm:ss')] File unlocked. Sending to Acrobat Droplet..."
+        try {
+            Start-Process -FilePath $droplet -ArgumentList "`"$filePath`"" -WindowStyle Hidden -Wait
+            Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Acrobat Droplet finished processing."
+        } catch {
+            Write-Host "[$(Get-Date -Format 'HH:mm:ss')] ERROR starting Droplet: $_"
+        }
+    } else {
+        Write-Host "[$(Get-Date -Format 'HH:mm:ss')] ERROR: File was locked for too long."
     }
 }
 
-# Register the filesystem event queue to handle multiple files smoothly
-Register-ObjectEvent -InputObject $watcher -EventName "Created" -Action $action -SourceIdentifier "PdfDropletMonitor"
+# Clear old events if restarting the script, then register the new one and hide the confusing table
+Unregister-Event -SourceIdentifier "PdfDropletMonitor" -ErrorAction SilentlyContinue
+Register-ObjectEvent -InputObject $watcher -EventName "Created" -Action $action -SourceIdentifier "PdfDropletMonitor" -MessageData $dropletPath | Out-Null
 
 Write-Host "Monitoring folder: $watchFolder"
-Write-Host "Waiting for PDF files. Do not close this window if you want the automation to run."
+Write-Host "Waiting for PDF files. Drop a NEW file into the Hot_folder to test it."
 
-# Keep the script running in the background indefinitely
 try {
-    do {
-        Wait-Event -Timeout 1
-    } while ($true)
+    do { Wait-Event -Timeout 1 } while ($true)
 } finally {
-    # Cleanup event listeners if the script is terminated
-    Unregister-Event -SourceIdentifier "PdfDropletMonitor"
+    Unregister-Event -SourceIdentifier "PdfDropletMonitor" -ErrorAction SilentlyContinue
     $watcher.EnableRaisingEvents = $false
     $watcher.Dispose()
 }
