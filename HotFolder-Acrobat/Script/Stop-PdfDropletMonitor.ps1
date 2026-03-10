@@ -1,0 +1,1 @@
+Get-Process powershell | Where-Object { $_.MainWindowTitle -eq "" } | Stop-Process -Force

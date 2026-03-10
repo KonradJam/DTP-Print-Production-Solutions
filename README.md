@@ -28,8 +28,6 @@ The table below lists the currently developed projects. Since each tool may rely
 | Solution Name | Repository Link | Brief Description of Capabilities |
 | :--- | :--- | :--- |
 | **Acrobat Hot Folder & Droplets** | [📁 `/HotFolder-Acrobat`](./HotFolder-Acrobat) | A PowerShell script automating preflight checks. PDFs dropped into the Hot Folder are automatically processed and verified using Adobe Acrobat Pro droplets. |
-| **PDF vs JPG Proof Comparator** | [📁 `/Proof-Comparator`](./Proof-Comparator) | A tool that automatically compares production PDFs against reference JPG proofs sent by the client, ensuring no unintended layout changes, hidden layers, or export errors occurred. |
-| *Your next project...* | *[📁 `/Next-Project`](./Next-Project)* | *Description coming soon...* |
 
 > **Best Practice Tip:** Navigate to the specific solution's folder and read its local `README.md` to learn how to deploy the tool in your specific work environment.
 
@@ -62,7 +60,7 @@ My passion lies in bridging the gap between traditional print workflows and mode
 
 **Connect with me:**
 - 💼 [LinkedIn](https://www.linkedin.com/in/konradjam) – Let's connect professionally
-- 🐙 [GitHub Issues](https://github.com/YourUsername/YourRepository/issues) – Report bugs or request features
+- 🐙 [GitHub Issues](https://github.com/KonradJam/DTP-Print-Production-Solutions/issues) – Report bugs or request features
 
 ---
 
