@@ -1,0 +1,14 @@
+
+{
+  "job_id": "J-2026-2",
+  "trim_mm": {
+    "width": 297,
+    "height": 420
+  },
+  "orientation": "portrait",
+  "bleed_mm": 3,
+  "min_ppi": 300,
+  "files": [
+    "bakery.jpg"
+  ]
+}

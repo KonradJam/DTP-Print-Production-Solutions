@@ -1,0 +1,123 @@
+{
+  "job_id": "J-2026-3",
+  "file": "jeweler.jpg",
+  "print_specification": {
+    "trim_mm": {
+      "width": 297,
+      "height": 420
+    },
+    "orientation": "portrait",
+    "bleed_mm": 3,
+    "min_ppi": 300,
+    "expected_files": [
+      "jeweler.jpg"
+    ]
+  },
+  "technical_validation": {
+    "status": "PASS",
+    "original_dimensions_px": {
+      "width": 3579,
+      "height": 5031
+    },
+    "size_at_300_ppi_mm": {
+      "width_mm": 303.02,
+      "height_mm": 425.96
+    },
+    "required_size_mm": {
+      "width": 303,
+      "height": 426
+    },
+    "effective_ppi": {
+      "x": 300,
+      "y": 300
+    },
+    "image_orientation": "portrait",
+    "ratio_error_pct": 0.02,
+    "errors": []
+  },
+  "ai_validation": {
+    "execution_status": "COMPLETED",
+    "attempts": 1,
+    "verdict": "REVIEW",
+    "report": {
+      "job_id": "J-2026-3",
+      "file": "jeweler.jpg",
+      "overall_verdict": "REVIEW",
+      "confidence": "high",
+      "summary": "The 1:1 crops reveal pervasive interpolation softness and a lack of authentic 300 PPI micro-detail across both typography and jewelry assets. Small body text and fine serif contours in the upper-left and bottom-left samples exhibit broad, multi-pixel transition zones and faint compression ringing instead of crisp edges. While pixel blocks are smoothed out and overall tonal gradations remain stable, the true resolving power is significantly lower than the container resolution indicates.",
+      "important_issues": [
+        "Pervasive upscaling and interpolation blur across all inspected regions, resulting in soft typography and loss of fine micro-facets on jewelry.",
+        "Noticeable loss of edge definition in small body text and divider lines, which lack the sharpness expected for professional 300 PPI offset or digital print.",
+        "Mild JPEG compression ringing and mosquito noise surrounding high-contrast golden lettering on the dark background."
+      ],
+      "recommendation": "Submit for manual prepress review. Request that the client supply the layout with native vector typography and uncompressed, native-resolution photography, as printing this raster file at 300 PPI will result in visibly soft text and lacking jewelry detail at typical viewing distances.",
+      "criteria": {
+        "sharpness": {
+          "score": 2,
+          "comment": "Genuine fine detail is absent across all crops; the facets of the diamond rings, gold bracelet filigree, and serif letter contours appear distinctly soft rather than sharply resolved at 1:1 scale."
+        },
+        "blur": {
+          "score": 2,
+          "comment": "Noticeable uniform blur affects all elements, including critical small typography ('fine jewelry, handcrafted...') and structural lines, indicating the file was not rendered at native 300 PPI."
+        },
+        "pixelation": {
+          "score": 4,
+          "comment": "Direct pixelation and stair-stepping blocks are not prominent, having been smoothed over by bilinear or bicubic interpolation."
+        },
+        "compression_artifacts": {
+          "score": 3,
+          "comment": "Ringing, mosquito noise, and subtle blockiness are observable immediately adjacent to high-contrast letterforms like 'UMIÈ' and 'EWEL HOU' against the black background."
+        },
+        "upscaling_artifacts": {
+          "score": 2,
+          "comment": "Strong visual evidence of upscaling: stroke boundaries span multiple softly interpolated pixels and fine internal microtextures in metal and gemstones are blurred and merged into indistinct shapes."
+        },
+        "digital_noise": {
+          "score": 4,
+          "comment": "Digital sensor noise is minimal across dark backgrounds and midtone textures, with no disruptive luminance or chrominance grain."
+        },
+        "over_smoothing": {
+          "score": 3,
+          "comment": "Gemstone facets and metallic reflections show smoothing and smearing of fine surfaces, lacking crisp micro-reflections and tactile material definition."
+        },
+        "over_sharpening": {
+          "score": 4,
+          "comment": "There are no significant edge-enhancement halos or unnatural dark/light fringing borders; the image leans heavily toward softness rather than oversharpening."
+        },
+        "color_banding": {
+          "score": 4,
+          "comment": "Background dark areas and soft lighting transitions do not exhibit severe stepping or harsh quantization breaks, maintaining reasonable tonal continuity."
+        },
+        "aliasing": {
+          "score": 4,
+          "comment": "Diagonal lines and curved letterforms show no prominent jagged stair-stepping due to heavy antialiasing and smoothing."
+        },
+        "moire_pattern": {
+          "score": 5,
+          "comment": "No moire or geometric interference patterns are visible in the repeating links of the bracelets, rings, or fabric folds."
+        },
+        "clipping": {
+          "score": 4,
+          "comment": "Specular highlight blowouts on diamond reflections and light glints are natural and expected; shadow levels in the dark marble and velvet retain appropriate depth."
+        },
+        "color_artifacts": {
+          "score": 4,
+          "comment": "Gold tones, gemstones, and dark backgrounds remain tonally clean without conspicuous chroma bleeding or chromatic aberrations."
+        },
+        "ai_artifacts": {
+          "score": 3,
+          "comment": "Some secondary ring settings and gem pavilion geometry in the lower crops display slightly melted or inconsistent structural anatomy typical of synthetic or generative assets, though blurred rasterization obscures definitive determination."
+        },
+        "fine_detail_legibility": {
+          "score": 3,
+          "comment": "Small text remains readable, but letter strokes are fuzzy and lack crisp terminal definition, which risks ink gain and diminished legibility when printed on press."
+        },
+        "visual_consistency": {
+          "score": 3,
+          "comment": "The level of interpolation softness and edge diffusion is uniformly distributed across typography, graphics, and photographic subjects, reflecting an entire composite flattened and scaled together."
+        }
+      }
+    },
+    "validation_errors": []
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "job_id": "J-2026-2",
+  "file": "bakery.jpg",
+  "print_specification": {
+    "trim_mm": {
+      "width": 297,
+      "height": 420
+    },
+    "orientation": "portrait",
+    "bleed_mm": 3,
+    "min_ppi": 300,
+    "expected_files": [
+      "bakery.jpg"
+    ]
+  },
+  "technical_validation": {
+    "status": "PASS",
+    "original_dimensions_px": {
+      "width": 3579,
+      "height": 5031
+    },
+    "size_at_300_ppi_mm": {
+      "width_mm": 303.02,
+      "height_mm": 425.96
+    },
+    "required_size_mm": {
+      "width": 303,
+      "height": 426
+    },
+    "effective_ppi": {
+      "x": 300,
+      "y": 300
+    },
+    "image_orientation": "portrait",
+    "ratio_error_pct": 0.02,
+    "errors": []
+  },
+  "ai_validation": {
+    "execution_status": "COMPLETED",
+    "attempts": 1,
+    "verdict": "PASS",
+    "report": {
+      "job_id": "J-2026-2",
+      "file": "bakery.jpg",
+      "overall_verdict": "PASS",
+      "confidence": "high",
+      "summary": "The 1:1 crop inspections demonstrate sound overall technical image quality suitable for 300 PPI print reproduction. Fine typography and line graphics show smooth anti-aliased transitions without severe compression blocking or aliasing. Textures across the bread crumb, crust, seeds, and background wood surface maintain good fidelity with minimal loss to compression or noise reduction.",
+      "important_issues": [],
+      "recommendation": "The raster image meets standard commercial print requirements for its intended 300 PPI output size. It can proceed to production without technical reprocessing.",
+      "criteria": {
+        "sharpness": {
+          "score": 4,
+          "comment": "Edge definition on raster typography and natural textures on the bread crumb and wood surface show good definition without significant softening."
+        },
+        "blur": {
+          "score": 4,
+          "comment": "The primary focal subjects—including the sliced loaf, seeds, and foreground graphic overlays—are clear and free from accidental motion or focus blur."
+        },
+        "pixelation": {
+          "score": 5,
+          "comment": "No individual pixel blocks or stair-stepping resolution limits are discernible at 1:1 scale."
+        },
+        "compression_artifacts": {
+          "score": 4,
+          "comment": "Only minor, standard JPEG artifacts are visible along high-contrast text boundaries, with no obstructive blocking or mosquito noise across midtones."
+        },
+        "upscaling_artifacts": {
+          "score": 4,
+          "comment": "Curves and micro-textures appear naturally rendered with no distinctive bicubic ringing or blurred interpolation trails indicating low-resolution scaling."
+        },
+        "digital_noise": {
+          "score": 4,
+          "comment": "Luminance and chrominance noise levels are low and unobtrusive across dark wooden areas and shadowed bread textures."
+        },
+        "over_smoothing": {
+          "score": 4,
+          "comment": "Surface textures in the bread crumb, crust, and rustic background retain natural roughness without signs of aggressive bilateral filtering or plastic smoothing."
+        },
+        "over_sharpening": {
+          "score": 4,
+          "comment": "High-contrast boundaries, including white and gold typography on dark wood, show clean transitions devoid of harsh unsharp-masking halos."
+        },
+        "color_banding": {
+          "score": 4,
+          "comment": "Subtle tonal gradients in the background lighting and shadowed wood areas render smoothly without prominent stepping or contour breaks."
+        },
+        "aliasing": {
+          "score": 4,
+          "comment": "Circular graphic elements and curved letterforms in the inspectable crops display clean anti-aliasing without jagged steps."
+        },
+        "moire_pattern": {
+          "score": 5,
+          "comment": "Repetitive crumb structures and linen fabric weave visible in the crops show no harmonic interference or moiré patterns."
+        },
+        "clipping": {
+          "score": 4,
+          "comment": "Flour dustings on the crust retain textural tone without complete highlight blowout, while shadow areas in the wooden table retain structural detail."
+        },
+        "color_artifacts": {
+          "score": 4,
+          "comment": "No visible chromatic aberration, false color fringing, or chromatic bleeding is apparent along high-contrast text edges or grain seeds."
+        },
+        "ai_artifacts": {
+          "score": 4,
+          "comment": "The bread crumb, crust formations, and surrounding seeds present physically coherent, realistic organic structures without anomalous AI distortion."
+        },
+        "fine_detail_legibility": {
+          "score": 4,
+          "comment": "Smaller secondary typographic elements, such as 'ARTISAN BREAD' and 'Freshly Baked Daily', remain legible and well resolved at native resolution."
+        },
+        "visual_consistency": {
+          "score": 4,
+          "comment": "Sharpness, grain characteristics, and edge rendering are uniform between graphic overlay elements and the underlying photographic imagery across all inspected crops."
+        }
+      }
+    },
+    "validation_errors": []
+  }
+}

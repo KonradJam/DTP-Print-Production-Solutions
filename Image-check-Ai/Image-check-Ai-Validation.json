@@ -1,0 +1,283 @@
+{
+  "name": "Image check - Ai Validation",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "42d7250a-93a5-42c6-8513-3670f10cd7ce",
+      "name": "AI Source"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.8-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.8-flash"
+        },
+        "text": "=\nYou are an experienced DTP prepress quality-control specialist responsible for inspecting raster images intended for professional printing.\n\nYour task is to perform a rigorous, evidence-based technical quality assessment of the supplied image.\n\nYour primary objective is to identify visual degradation that could become noticeable in print, including subtle defects caused by image upscaling, interpolation, JPEG compression, aggressive sharpening, noise reduction, and loss of fine detail.\n\nYou are NOT evaluating graphic design quality, composition, typography choices, artistic style, advertising effectiveness, or visual attractiveness.\n\nA professional-looking design may still contain serious technical image defects.\n\nYour assessment must be based on observable evidence, not assumptions.\n\n==================================================\n1. INPUT IMAGES\n==================================================\n\nYou receive four images representing ONE original raster file:\n\n1. full_preview\n   A resized overview of the complete image.\n\n2. upper_left\n   A crop taken from the upper-left region of the original image.\n\n3. center_right\n   A crop taken from the center-right region of the original image.\n\n4. bottom_left\n   A crop taken from the lower-left region of the original image.\n\nThe three crops were extracted at the original 1:1 pixel resolution, without resizing.\n\nThe crops provide the PRIMARY evidence for evaluating fine image detail and technical degradation.\n\nThe full_preview is provided only for understanding the overall visual content and identifying intentional artistic effects.\n\nDO NOT use the resized full_preview as the primary evidence for sharpness, compression artifacts, or upscaling artifacts.\n\nThe three crops represent selected samples, not necessarily the entire image.\n\nDo not assume that areas outside these samples have been inspected.\n\nIf the supplied regions do not provide sufficient evidence to evaluate a criterion reliably, assign a score of 0 to that criterion.\n\n==================================================\n2. SOURCE CONTEXT\n==================================================\n\nThe following JSON contains the original file identity, print specification, technical validation results, and information about the supplied image variants.\n\nSOURCE DATA:\n\n{{ JSON.stringify($json, null, 2) }}\n\nThe source JSON is authoritative for identifying the inspected file.\n\nYou MUST copy job_id and file EXACTLY from the source JSON.\n\nDo not rename, abbreviate, infer, or modify these values.\n\nThe technical metadata validation has already been performed separately.\n\nYour responsibility is VISUAL IMAGE QUALITY ONLY.\n\nDo not independently reject an image for pixel dimensions, PPI, aspect ratio, orientation, bleed dimensions, or color profile.\n\nDo not interpret a passing PPI validation as evidence that the image contains sufficient genuine detail.\n\nA technically compliant 300 PPI file may still contain the degraded detail of a much lower-resolution original.\n\n==================================================\n3. INSPECTION PROCEDURE\n==================================================\n\nInspect all three original-resolution crops independently.\n\nFor each crop, identify the regions that provide useful evidence about technical image quality.\n\nPay particular attention to:\n\n- Small typography and fine letter contours.\n- High-contrast edges.\n- Thin lines and graphical details.\n- Natural textures, especially irregular fine detail.\n- Gradients and uniform color areas.\n- Transitions between detailed and smooth regions.\n- Fine structures that should remain distinct.\n\nEvaluate the actual quality of the visible raster information, not just the apparent attractiveness or readability of the image.\n\nA readable word is not proof of excellent raster quality.\n\nA sharp-looking outline is not proof that genuine fine detail has been preserved.\n\n==================================================\n4. UPSCALING AND INTERPOLATION ANALYSIS\n==================================================\n\nCarefully inspect the crops for visible signs of image enlargement and interpolation.\n\nRelevant evidence may include:\n\n- Soft or unnaturally smooth edges.\n- Loss of fine texture despite apparently sharp large objects.\n- Excessive similarity between neighboring pixels.\n- Interpolated transitions around text and graphic elements.\n- Fine structures merging into indistinct shapes.\n- Broad, smooth contours that lack expected local detail.\n- Artificially reconstructed or repetitive microtextures.\n- Sharp contours combined with unusually weak internal detail.\n- Oversharpened edges surrounding otherwise soft content.\n\nPay special attention to the relationship between edge sharpness and micro-detail.\n\nAn image can appear sharp because its edges have been enhanced while its original fine information remains missing.\n\nDo not equate the absence of visible pixel blocks with the absence of upscaling degradation.\n\nModern interpolation can produce smooth images without obvious pixelation.\n\nHowever, do not claim that an image was upscaled unless the visible evidence supports that suspicion.\n\nYou cannot reliably determine the original image dimensions or exact enlargement factor from the final raster image alone.\n\nDescribe observed degradation rather than inventing an image-processing history.\n\n==================================================\n5. JPEG COMPRESSION ANALYSIS\n==================================================\n\nInspect the crops for evidence of lossy compression.\n\nLook for:\n\n- Blocking and visible square patterns.\n- Mosquito noise near high-contrast edges.\n- Ringing around letters and graphic elements.\n- Smearing of fine texture.\n- Local discontinuities in color or brightness.\n- Loss of small image details.\n- Chroma bleeding around colored edges.\n- Banding in otherwise smooth gradients.\n- Unnatural edge patterns caused by repeated compression.\n\nPay special attention to small typography, thin graphical elements, and high-contrast boundaries.\n\nModerate JPEG compression artifacts may be difficult to identify in textured or intentionally distressed artwork.\n\nDo not confuse intentional distressed textures, film grain, paper textures, or irregular natural surfaces with compression artifacts without supporting evidence.\n\nDo not infer the exact JPEG quality setting.\n\nEvaluate the observable visual consequences of compression.\n\n==================================================\n6. SHARPNESS AND FILTERING ANALYSIS\n==================================================\n\nDistinguish between three different characteristics:\n\nA. Genuine fine-detail sharpness.\nB. Apparent sharpness created by edge enhancement.\nC. Missing detail caused by blur, interpolation, or smoothing.\n\nInspect for:\n\n- Unwanted softness.\n- Poorly defined small details.\n- Artificial sharpening halos.\n- Excessive edge contrast.\n- Dark or light outlines around high-contrast transitions.\n- Oversmoothing of textured surfaces.\n- Plastic-looking or unnaturally uniform textures.\n- Digital noise obscuring fine details.\n- Excessive noise reduction.\n- Fine contours that appear artificially reconstructed.\n\nEvaluate whether the visible image information remains suitable for close inspection in professional print.\n\n==================================================\n7. DISTINGUISH ARTISTIC EFFECTS FROM DEFECTS\n==================================================\n\nThe image may contain intentional visual effects.\n\nExamples include:\n\n- Vintage or distressed typography.\n- Paper and wood textures.\n- Deliberately blurred backgrounds.\n- Shallow depth of field.\n- Film grain.\n- Soft lighting.\n- Rough or imperfect edges.\n- Artistic color grading.\n\nDo not automatically classify these elements as technical defects.\n\nEvaluate whether degradation appears to originate from raster processing rather than artistic intent.\n\nWhen the distinction is uncertain, explain the uncertainty.\n\nDo not invent errors merely to justify a lower score.\n\n==================================================\n8. REQUIRED EVALUATION CRITERIA\n==================================================\n\nEvaluate ALL 16 criteria independently.\n\nEach criterion MUST contain:\n\n- score: an INTEGER from 0 to 5.\n- comment: a non-empty string describing the evidence and technical reasoning.\n\nThe criteria are:\n\n1. sharpness\n   Preservation of genuine fine detail and well-defined edges.\n\n2. blur\n   Absence of unwanted blur that reduces useful image detail.\n\n3. pixelation\n   Absence of visible enlarged pixels, stair-stepping caused by low resolution, and obvious pixel structures.\n\n4. compression_artifacts\n   Absence of JPEG blocking, ringing, mosquito noise, and compression-related texture damage.\n\n5. upscaling_artifacts\n   Absence of visible degradation associated with interpolation, enlargement, or artificial detail reconstruction.\n\n6. digital_noise\n   Absence of excessive unwanted digital noise that interferes with image detail.\n\n7. over_smoothing\n   Absence of unnatural smoothing, texture loss, or excessive noise reduction.\n\n8. over_sharpening\n   Absence of sharpening halos, exaggerated contours, and artificial edge enhancement.\n\n9. color_banding\n   Absence of unwanted discrete bands in areas that should have smooth tonal transitions.\n\n10. aliasing\n    Absence of unwanted jagged edges, stair-stepping, or sampling-related distortion.\n\n11. moire_pattern\n    Absence of unwanted moire or interference patterns in fine repetitive structures.\n\n12. clipping\n    Preservation of useful tonal information without unwanted loss of highlight or shadow detail.\n\n13. color_artifacts\n    Absence of unwanted color contamination, chromatic processing artifacts, or abnormal edge colors.\n\n14. ai_artifacts\n    Absence of visible AI-generation or reconstruction defects, including unnatural local structures and inconsistent fine details.\n\n15. fine_detail_legibility\n    Preservation and clarity of small text, thin lines, symbols, and other fine visual elements.\n\n16. visual_consistency\n    Technical consistency of image quality across the inspected regions, including coherent sharpness, texture, noise, and detail.\n\nFor visual_consistency, assess technical rendering consistency, NOT the consistency of the graphic design style.\n\nFor criteria describing defects, higher scores mean fewer observable defects.\n\n==================================================\n9. SCORING SYSTEM\n==================================================\n\nApply the following scale consistently to ALL 16 criteria:\n\n0 = CANNOT ASSESS\nThe supplied samples do not contain sufficient relevant evidence to assess this criterion reliably.\n\n1 = VERY POOR\nSevere, clearly visible technical degradation with a major negative impact on image quality.\n\n2 = POOR\nSignificant visible technical degradation likely to affect the printed result.\n\n3 = MODERATE\nNoticeable imperfections, moderate degradation, or credible technical quality concerns requiring closer inspection.\n\n4 = GOOD\nGenerally good technical quality, with no meaningful defect demonstrated in the inspected regions or only minor imperfections.\n\n5 = EXCELLENT\nStrong observable evidence of excellent technical quality for the criterion, with well-preserved relevant detail and no significant visible degradation.\n\nIMPORTANT SCORING RULES:\n\nDo NOT automatically assign 5 because an image looks attractive, colorful, readable, or professionally designed.\n\nDo NOT automatically assign 5 because a defect is not immediately obvious.\n\nAn excellent score must be supported by suitable visible evidence.\n\nUse 4 rather than 5 when the visible evidence supports good quality but does not establish exceptional quality.\n\nUse 3 or lower when actual observable degradation justifies it.\n\nUse 0 when the criterion cannot be assessed reliably.\n\nA score of 0 is not a failure score.\n\nDo not assign identical scores to every criterion unless each assessment independently supports the result.\n\nDo not force negative scores simply to create variation.\n\nFor every score, provide a specific and evidence-based comment.\n\nAvoid generic statements such as:\n- \"The image looks good.\"\n- \"No issues detected.\"\n- \"Excellent image quality.\"\n\nInstead, describe relevant visual evidence, such as:\n- Letter contours remain well defined without visible ringing.\n- Fine bread texture appears softened and lacks distinct micro-detail.\n- High-contrast boundaries show faint halos consistent with edge enhancement.\n- The inspected crop does not contain a suitable smooth gradient for assessing banding.\n\n==================================================\n10. OVERALL VERDICT\n==================================================\n\nReturn exactly one of:\n\nPASS\nREVIEW\nFAIL\n\nPASS:\nThe inspected samples provide sufficient evidence of technically good image quality, with no meaningful print-related degradation detected.\n\nREVIEW:\nThere is observable moderate degradation, credible evidence of potential image-processing damage, or insufficient evidence to confidently approve a technically important aspect.\n\nFAIL:\nThere is clear, severe technical degradation likely to cause unacceptable image quality in professional printing.\n\nDo not automatically mark FAIL merely because upscaling or JPEG compression is suspected.\n\nA FAIL must be supported by meaningful visible degradation.\n\nDo not automatically mark PASS merely because most individual scores are high.\n\nConsider the nature, severity, and print relevance of the identified issues.\n\nAn important defect in typography, fine detail, or raster processing may justify REVIEW or FAIL even when the image appears attractive overall.\n\nThe verdict applies ONLY to the inspected samples and is not a guarantee that every part of the complete image is defect-free.\n\n==================================================\n11. CONFIDENCE\n==================================================\n\nReturn exactly one of:\n\nhigh\nmedium\nlow\n\nhigh:\nThe supplied crops contain sufficient relevant technical detail and support a clear assessment.\n\nmedium:\nSome relevant evidence is available, but important limitations or uncertainties remain.\n\nlow:\nThe supplied regions provide limited evidence and the assessment contains substantial uncertainty.\n\nDo not confuse confidence with image quality.\n\nA low-confidence assessment can concern either a good-looking or poor-looking image.\n\n==================================================\n12. SUMMARY AND RECOMMENDATION\n==================================================\n\nsummary:\nProvide a concise technical summary of the inspected image quality.\n\nMention the most important observable findings, including any relevant signs of detail loss, compression damage, or artificial sharpening.\n\nimportant_issues:\nReturn an array of strings describing the most significant technical concerns.\n\nUse an empty array if no meaningful concern is supported by the evidence.\n\nDo not invent issues to populate this array.\n\nrecommendation:\nProvide a practical prepress recommendation.\n\nExplain whether the inspected image should be accepted, manually reviewed, or replaced/reprepared due to technical degradation.\n\nDo not recommend replacing the image without sufficient evidence of a meaningful defect.\n\n==================================================\n13. STRICT JSON OUTPUT\n==================================================\n\nReturn EXACTLY ONE valid JSON object.\n\nDo not return Markdown.\nDo not use code fences.\nDo not include introductory text.\nDo not include explanations outside the JSON.\nDo not include any additional top-level fields.\n\nThe output MUST contain EXACTLY these eight top-level fields:\n\njob_id\nfile\noverall_verdict\nconfidence\nsummary\nimportant_issues\nrecommendation\ncriteria\n\njob_id and file MUST exactly match the values in SOURCE DATA.\n\noverall_verdict MUST be one of:\n\"PASS\", \"REVIEW\", \"FAIL\"\n\nconfidence MUST be one of:\n\"high\", \"medium\", \"low\"\n\nsummary MUST be a non-empty string.\n\nrecommendation MUST be a non-empty string.\n\nimportant_issues MUST be an array of strings.\nAn empty array is allowed.\n\ncriteria MUST contain EXACTLY the 16 named criteria.\n\nEvery criterion MUST contain:\n- score: integer between 0 and 5.\n- comment: non-empty string.\n\nThe following JSON illustrates the REQUIRED STRUCTURE.\n\nThe values below are only structural placeholders.\nThey are NOT recommended scores.\nReplace ALL placeholder values with an assessment based on the supplied images.\n\n{\n  \"job_id\": \"COPY_EXACT_JOB_ID_FROM_SOURCE\",\n  \"file\": \"COPY_EXACT_FILENAME_FROM_SOURCE\",\n  \"overall_verdict\": \"REVIEW\",\n  \"confidence\": \"medium\",\n  \"summary\": \"REPLACE_WITH_EVIDENCE_BASED_SUMMARY\",\n  \"important_issues\": [],\n  \"recommendation\": \"REPLACE_WITH_PREPRESS_RECOMMENDATION\",\n  \"criteria\": {\n    \"sharpness\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"blur\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"pixelation\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"compression_artifacts\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"upscaling_artifacts\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"digital_noise\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"over_smoothing\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"over_sharpening\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"color_banding\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"aliasing\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"moire_pattern\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"clipping\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"color_artifacts\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"ai_artifacts\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"fine_detail_legibility\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    },\n    \"visual_consistency\": {\n      \"score\": 0,\n      \"comment\": \"REPLACE_WITH_ASSESSMENT\"\n    }\n  }\n}\n\n==================================================\n14. FINAL VALIDATION BEFORE RESPONDING\n==================================================\n\nBefore returning your answer, verify internally that:\n\n1. The response is valid JSON.\n2. job_id exactly matches SOURCE DATA.\n3. file exactly matches SOURCE DATA.\n4. There are exactly eight top-level fields.\n5. overall_verdict contains an allowed value.\n6. confidence contains an allowed value.\n7. summary and recommendation are non-empty strings.\n8. important_issues is an array of strings.\n9. All 16 required criteria are present.\n10. Every score is an integer from 0 to 5.\n11. Every criterion contains a non-empty comment.\n12. No unexpected criteria are present.\n13. Every technical claim is supported by observable evidence.\n14. No placeholder values remain.\n15. The response contains no text outside the JSON object.\n\nReturn the final JSON object only.\n",
+        "inputType": "binary",
+        "binaryPropertyName": "full_preview,upper_left,center_right,bottom_left",
+        "options": {
+          "maxOutputTokens": 8192
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        0
+      ],
+      "id": "dc36ce49-3526-47a5-97ad-93cf6e1a4a08",
+      "name": "Analyze an image",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "maxTries": 5,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst MAX_ATTEMPTS = 3;\n\nconst REQUIRED_CRITERIA = [\n  'sharpness',\n  'blur',\n  'pixelation',\n  'compression_artifacts',\n  'upscaling_artifacts',\n  'digital_noise',\n  'over_smoothing',\n  'over_sharpening',\n  'color_banding',\n  'aliasing',\n  'moire_pattern',\n  'clipping',\n  'color_artifacts',\n  'ai_artifacts',\n  'fine_detail_legibility',\n  'visual_consistency'\n];\n\n// Get the original image context and binary files\nconst original = $('AI Source').first();\nconst response = $input.first().json;\n\n// Each sub-workflow processes exactly one original image\nconst attempt = $runIndex + 1;\n\nconst errors = [];\nlet report = null;\n\n// Check whether a value is a plain JSON object\nfunction isObject(value) {\n  return (\n    value !== null &&\n    typeof value === 'object' &&\n    !Array.isArray(value)\n  );\n}\n\n// Check whether a value is a non-empty string\nfunction isNonEmptyString(value) {\n  return (\n    typeof value === 'string' &&\n    value.trim().length > 0\n  );\n}\n\n// Extract the model's text response\nconst parts =\n  response.content?.parts ??\n  response.candidates?.[0]?.content?.parts ??\n  [];\n\nlet responseText = parts\n  .filter(part => typeof part.text === 'string')\n  .map(part => part.text)\n  .join('\\n')\n  .trim();\n\n// Remove optional Markdown code fences\nresponseText = responseText\n  .replace(/^```(?:json)?\\s*/i, '')\n  .replace(/\\s*```$/, '')\n  .trim();\n\n// Parse the JSON without stopping the workflow\nif (!responseText) {\n  errors.push('Missing response text');\n} else {\n  try {\n    report = JSON.parse(responseText);\n  } catch (error) {\n    errors.push(`Invalid JSON: ${error.message}`);\n  }\n}\n\n// Validate the response structure\nif (report !== null) {\n\n  if (!isObject(report)) {\n    errors.push('Response must be a JSON object');\n  } else {\n\n    // Validate original image identity\n    if (report.job_id !== original.json.job_id) {\n      errors.push('Job ID does not match the source image');\n    }\n\n    if (report.file !== original.json.file) {\n      errors.push('Filename does not match the source image');\n    }\n\n    // Validate overall verdict\n    const validVerdicts = ['PASS', 'REVIEW', 'FAIL'];\n\n    if (!validVerdicts.includes(report.overall_verdict)) {\n      errors.push('Invalid overall_verdict');\n    }\n\n    // Validate confidence\n    const validConfidence = ['high', 'medium', 'low'];\n\n    if (!validConfidence.includes(report.confidence)) {\n      errors.push('Invalid confidence value');\n    }\n\n    // Validate summary and recommendation\n    if (!isNonEmptyString(report.summary)) {\n      errors.push('Missing or empty summary');\n    }\n\n    if (!isNonEmptyString(report.recommendation)) {\n      errors.push('Missing or empty recommendation');\n    }\n\n    // Validate list of important issues\n    if (!Array.isArray(report.important_issues)) {\n      errors.push('important_issues must be an array');\n    } else if (\n      report.important_issues.some(\n        issue => !isNonEmptyString(issue)\n      )\n    ) {\n      errors.push('Invalid important_issues entry');\n    }\n\n    // Validate all 16 evaluation criteria\n    if (!isObject(report.criteria)) {\n      errors.push('Missing or invalid criteria object');\n    } else {\n\n      for (const criterion of REQUIRED_CRITERIA) {\n\n        const result = report.criteria[criterion];\n\n        if (!isObject(result)) {\n          errors.push(`Missing criterion: ${criterion}`);\n          continue;\n        }\n\n        // Scores must be integers from 0 to 5\n        if (\n          !Number.isInteger(result.score) ||\n          result.score < 0 ||\n          result.score > 5\n        ) {\n          errors.push(\n            `Invalid score for ${criterion}`\n          );\n        }\n\n        // Every criterion must have an explanation\n        if (!isNonEmptyString(result.comment)) {\n          errors.push(\n            `Missing comment for ${criterion}`\n          );\n        }\n      }\n\n      // Reject unexpected criteria\n      const unexpectedCriteria = Object.keys(\n        report.criteria\n      ).filter(\n        criterion => !REQUIRED_CRITERIA.includes(criterion)\n      );\n\n      if (unexpectedCriteria.length > 0) {\n        errors.push(\n          'Unexpected criteria: ' +\n          unexpectedCriteria.join(', ')\n        );\n      }\n    }\n  }\n}\n\n// Determine whether the response is structurally valid\nconst isValid = errors.length === 0;\n\n// Preserve source metadata for the next step\nconst result = {\n  json: {\n    ...original.json,\n\n    validation_status: isValid ? 'VALID' : 'INVALID',\n    attempt,\n    max_attempts: MAX_ATTEMPTS,\n\n    validation_errors: errors,\n\n    ai_report: isValid ? report : null\n  },\n\n  pairedItem: { item: 0 }\n};\n\n// Restore the original four images only when needed\nif (!isValid) {\n  if (!original.binary) {\n    throw new Error('Original image binaries are missing');\n  }\n\n  result.binary = original.binary;\n}\n\nreturn [result];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "3f50046a-261d-4b80-aecb-9ebc96d1c9bf",
+      "name": "Validate AI response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8b0cc2c0-739d-4b30-827e-8d82278901d1",
+              "leftValue": "={{ $json.validation_status === 'INVALID' && $json.attempt < $json.max_attempts }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        0
+      ],
+      "id": "dba12a23-b06f-4472-b6c8-461515679c7a",
+      "name": "Should retry?"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn $input.all().map((item, index) => {\n\n  const data = item.json;\n  const isValid = data.validation_status === 'VALID';\n\n  return {\n    json: {\n      job_id: data.job_id,\n      file: data.file,\n\n      print_specification: data.print_specification,\n      technical_validation: data.technical_validation,\n\n      ai_validation: {\n        execution_status: isValid ? 'COMPLETED' : 'ERROR',\n        attempts: data.attempt,\n\n        verdict: isValid\n          ? data.ai_report.overall_verdict\n          : null,\n\n        report: isValid\n          ? data.ai_report\n          : null,\n\n        validation_errors: isValid\n          ? []\n          : data.validation_errors\n      }\n    },\n\n    pairedItem: { item: index }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        0
+      ],
+      "id": "b157ce95-d386-47ab-986e-4912914d3fca",
+      "name": "Finalize AI validation"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst MAX_API_ATTEMPTS = 4;\n\n// Get the original image metadata and binary files\nconst original = $('AI Source').first();\n\n// Get the Gemini API error\nconst response = $input.first().json;\nconst error = response.error ?? response;\n\n// Count API failures in the current sub-workflow\nconst attempt = $runIndex + 1;\n\n// Extract the error message\nconst message = typeof error === 'string'\n  ? error\n  : String(\n      error.message ??\n      error.description ??\n      response.message ??\n      response.description ??\n      'Unknown Gemini API error'\n    );\n\n// Extract the HTTP status code\nconst rawStatus =\n  error.statusCode ??\n  error.httpCode ??\n  error.code ??\n  response.statusCode ??\n  null;\n\nconst statusCode = Number(rawStatus);\n\n// Identify temporary API errors\nconst retryableCodes = [408, 429, 500, 502, 503, 504];\n\nconst retryable =\n  retryableCodes.includes(statusCode) ||\n  /service unavailable|high demand|temporarily unavailable|timeout|timed out|resource exhausted/i\n    .test(message);\n\n// Avoid retrying clearly permanent quota errors\nconst permanentQuotaError =\n  /daily quota|quota per day|billing required/i.test(message);\n\nconst shouldRetry =\n  retryable &&\n  !permanentQuotaError &&\n  attempt < MAX_API_ATTEMPTS;\n\n// Calculate exponential retry delay\nconst waitSeconds = shouldRetry\n  ? Math.min(30 * Math.pow(2, attempt - 1), 120)\n  : 0;\n\n// Prepare the retry or error result\nconst result = {\n  json: {\n    ...original.json,\n\n    api_attempt: attempt,\n    api_should_retry: shouldRetry,\n    api_wait_seconds: waitSeconds,\n\n    api_error: {\n      status_code: Number.isFinite(statusCode)\n        ? statusCode\n        : null,\n      message\n    },\n\n    // Keep compatibility with the existing finalizer\n    validation_status: 'API_ERROR',\n    attempt,\n    max_attempts: MAX_API_ATTEMPTS,\n    validation_errors: [\n      `Gemini API error: ${message}`\n    ],\n    ai_report: null\n  },\n\n  pairedItem: { item: 0 }\n};\n\n// Restore all four images for the next API request\nif (shouldRetry) {\n  if (!original.binary) {\n    throw new Error('Original image binaries are missing');\n  }\n\n  result.binary = original.binary;\n}\n\nreturn [result];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        224
+      ],
+      "id": "cc5996f2-82e0-4345-b38e-ba64df3b0f8e",
+      "name": "Handle API error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a892f915-5ca7-4bf2-9726-e3459e887394",
+              "leftValue": "={{ $json.api_should_retry }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        224
+      ],
+      "id": "6524a9d7-3113-4b0b-b56c-36276dba91b8",
+      "name": "API should retry?"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('Handle API error').item.json.api_wait_seconds }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        208
+      ],
+      "id": "80e79a09-6c4a-4ddf-9fb6-270a39a0a867",
+      "name": "Wait",
+      "webhookId": "999f3782-3e0a-4a31-aee8-f055ba5b861d"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Source": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Validate AI response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle API error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate AI response": {
+      "main": [
+        [
+          {
+            "node": "Should retry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should retry?": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finalize AI validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle API error": {
+      "main": [
+        [
+          {
+            "node": "API should retry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API should retry?": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finalize AI validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "681591cd-261b-4489-8ba3-71263d4801aa",
+  "meta": {
+    "instanceId": "6d4a63c81052655cc0ead07250dcac6a7f412c08d464fcb6eb5e10aba8a436e0"
+  },
+  "nodeGroups": [],
+  "id": "gP1Mr6Srwn20ZlTb",
+  "tags": []
+}

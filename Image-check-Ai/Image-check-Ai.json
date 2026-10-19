@@ -1,0 +1,1116 @@
+{
+  "name": "Image check - Ai",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -640,
+        0
+      ],
+      "id": "86c65d53-dd46-469f-918f-20544e2bbdf2",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "jobs",
+        "columns": {
+          "column": [
+            {
+              "name": "job_id"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "checked_at",
+              "type": "date"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "e9b23e41-3b95-4d1f-b47e-ff1783ddca64",
+      "name": "Create a data table"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        0
+      ],
+      "id": "ccc96650-ac40-432d-92cb-78f1eef3ab39",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "value": "jobs",
+          "mode": "name"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "job_id",
+              "keyValue": "={{ $json.data.job_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        0
+      ],
+      "id": "2a1dd448-2e2d-4748-8d30-0b53fb90e25d",
+      "name": "If row does not exist",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Config').item.json.base_path + '/*/spec.json'}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "1ca68e1e-4a66-4118-a765-25912b1f1ffc",
+      "name": "Specification"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.files",
+        "include": "allOtherFields",
+        "options": {
+          "destinationFieldName": "file"
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "9be62e4d-f195-49a1-a785-331431b0a16e",
+      "name": "Split images"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "49b62e10-9b88-4761-a0b5-6a907dd6bf04",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "PASS",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1616,
+        0
+      ],
+      "id": "0eff7297-f4a2-4c61-9b30-854631733a1b",
+      "name": "IF - PASS"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.operation_type }}",
+                    "rightValue": "crop",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "eaaaf001-a3b0-430c-8e18-f376cf0bda5e"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9d3ed887-cbcc-40b7-b82a-8f45fdaef8cc",
+                    "leftValue": "={{ $json.operation_type }}",
+                    "rightValue": "resize",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2176,
+        -16
+      ],
+      "id": "edd172d1-af53-400f-bddb-8e7c13a44ca2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "crop",
+        "width": "={{ $json.crop_width }}",
+        "height": "={{ $json.crop_height }}",
+        "positionX": "={{ $json.crop_x }}",
+        "positionY": "={{ $json.crop_y }}",
+        "options": {
+          "fileName": "={{ $json.variant_name }}"
+        }
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1.1,
+      "position": [
+        2384,
+        -112
+      ],
+      "id": "d817302a-63e0-45e6-8632-34f2c7c97733",
+      "name": "Crop"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": "={{ $json.resize_height }}",
+        "height": "={{ $json.resize_width }}",
+        "options": {
+          "fileName": "={{ $json.variant_name }}"
+        }
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1.1,
+      "position": [
+        2384,
+        80
+      ],
+      "id": "e1f558a4-a27f-44b0-940d-30055f8d13f9",
+      "name": "Resize"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2592,
+        -16
+      ],
+      "id": "e223726c-6e8b-4bc7-af9b-5878040e7ff3",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst inputs = $input.all();\n\nconst REQUIRED_VARIANTS = [\n  'full_preview',\n  'upper_left',\n  'center_right',\n  'bottom_left'\n];\n\nconst groups = new Map();\nconst specifications = new Map();\nconst jobFiles = new Map();\n\n// Generate a unique identifier for each original image\nfunction getKey(jobId, fileName) {\n  return JSON.stringify([jobId, fileName]);\n}\n\n// Extract the specification from a source item\nfunction getSpec(source) {\n  return source.spec?.data ?? source.data ?? source.spec ?? source;\n}\n\n// Extract the original image filename\nfunction getFileName(source) {\n  return source.file ??\n    (typeof source.data?.files === 'string'\n      ? source.data.files\n      : null);\n}\n\n// Read the original print specifications\nfor (const item of $('Split images').all()) {\n\n  const source = item.json;\n  const spec = getSpec(source);\n\n  const jobId = spec.job_id;\n  const fileName = getFileName(source);\n\n  if (!jobId || !fileName) {\n    throw new Error('Invalid source specification');\n  }\n\n  const key = getKey(jobId, fileName);\n\n  if (specifications.has(key)) {\n    throw new Error(\n      `Duplicate source image: ${jobId}/${fileName}`\n    );\n  }\n\n  specifications.set(key, spec);\n\n  if (!jobFiles.has(jobId)) {\n    jobFiles.set(jobId, []);\n  }\n\n  jobFiles.get(jobId).push(fileName);\n}\n\n// Group processed images by job ID and original filename\nfor (let i = 0; i < inputs.length; i++) {\n\n  const item = inputs[i];\n  const data = item.json;\n\n  const jobId = data.job_id;\n  const fileName = data.file;\n  const variant = data.variant_name;\n\n  if (!jobId || !fileName || !variant) {\n    throw new Error(\n      `Missing image metadata in item ${i}`\n    );\n  }\n\n  if (!REQUIRED_VARIANTS.includes(variant)) {\n    throw new Error(\n      `Unknown image variant: ${variant}`\n    );\n  }\n\n  if (!item.binary?.data) {\n    throw new Error(\n      `Missing binary image: ${jobId}/${fileName}/${variant}`\n    );\n  }\n\n  const key = getKey(jobId, fileName);\n\n  if (!specifications.has(key)) {\n    throw new Error(\n      `Specification not found: ${jobId}/${fileName}`\n    );\n  }\n\n  // Create a group for the original image\n  if (!groups.has(key)) {\n    groups.set(key, {\n      job_id: jobId,\n      file: fileName,\n      report: data,\n      variants: {},\n      binary: {},\n      sourceIndices: []\n    });\n  }\n\n  const group = groups.get(key);\n\n  // Prevent duplicated image variants\n  if (group.variants[variant]) {\n    throw new Error(\n      `Duplicate variant: ${jobId}/${fileName}/${variant}`\n    );\n  }\n\n  // Verify consistent technical metadata\n  if (\n    group.report.width_px !== data.width_px ||\n    group.report.height_px !== data.height_px ||\n    group.report.status !== data.status\n  ) {\n    throw new Error(\n      `Inconsistent image metadata: ${jobId}/${fileName}`\n    );\n  }\n\n  // Create metadata describing the image variant\n  const variantInfo = {\n    name: variant,\n    operation: data.operation_type,\n    binary_field: variant,\n    file_name: item.binary.data.fileName ?? null,\n    mime_type: item.binary.data.mimeType ?? null\n  };\n\n  if (data.operation_type === 'crop') {\n\n    // Store crop coordinates in original image pixels\n    variantInfo.coordinates_px = {\n      x: Number(data.crop_x),\n      y: Number(data.crop_y)\n    };\n\n    variantInfo.dimensions_px = {\n      width: Number(data.crop_width),\n      height: Number(data.crop_height)\n    };\n\n    variantInfo.pixel_scale = 'original';\n\n    variantInfo.purpose =\n      'Evaluate sharpness, compression artifacts, ' +\n      'pixelation and fine image details';\n\n  } else if (data.operation_type === 'resize') {\n\n    // Store the dimensions of the resized overview\n    variantInfo.dimensions_px = {\n      width: Number(data.resize_width),\n      height: Number(data.resize_height)\n    };\n\n    variantInfo.pixel_scale = 'reduced';\n\n    variantInfo.purpose =\n      'Evaluate overall composition, visual consistency ' +\n      'and large-scale image defects';\n\n  } else {\n    throw new Error(\n      `Unsupported operation: ${data.operation_type}`\n    );\n  }\n\n  // Validate image variant dimensions\n  const variantW = variantInfo.dimensions_px.width;\n  const variantH = variantInfo.dimensions_px.height;\n\n  if (\n    !Number.isInteger(variantW) ||\n    !Number.isInteger(variantH) ||\n    variantW <= 0 ||\n    variantH <= 0 ||\n    variantW > 768 ||\n    variantH > 768\n  ) {\n    throw new Error(\n      `Invalid variant dimensions: ${jobId}/${fileName}/${variant}`\n    );\n  }\n\n  // Verify that crop coordinates are within image boundaries\n  if (data.operation_type === 'crop') {\n\n    const x = variantInfo.coordinates_px.x;\n    const y = variantInfo.coordinates_px.y;\n\n    if (\n      !Number.isInteger(x) ||\n      !Number.isInteger(y) ||\n      x < 0 ||\n      y < 0 ||\n      x + variantW > Number(data.width_px) ||\n      y + variantH > Number(data.height_px)\n    ) {\n      throw new Error(\n        `Invalid crop coordinates: ${jobId}/${fileName}/${variant}`\n      );\n    }\n  }\n\n  // Store the image and its metadata\n  group.variants[variant] = variantInfo;\n  group.binary[variant] = item.binary.data;\n  group.sourceIndices.push(i);\n}\n\n// Generate the final AI input\nconst results = [];\n\nfor (const group of groups.values()) {\n\n  const key = getKey(group.job_id, group.file);\n  const spec = specifications.get(key);\n\n  // Ensure all required images are available\n  const missing = REQUIRED_VARIANTS.filter(\n    variant => !group.variants[variant]\n  );\n\n  if (missing.length > 0) {\n    throw new Error(\n      `Missing variants for ${group.file}: ${missing.join(', ')}`\n    );\n  }\n\n  // Prepare original print specifications\n  const printSpecification = {\n    trim_mm: spec.trim_mm,\n    orientation: spec.orientation,\n    bleed_mm: spec.bleed_mm,\n    min_ppi: spec.min_ppi,\n    expected_files: jobFiles.get(group.job_id)\n  };\n\n  // Prepare the technical validation report\n  const report = group.report;\n\n  const technicalValidation = {\n    status: report.status,\n\n    original_dimensions_px: {\n      width: report.width_px,\n      height: report.height_px\n    },\n\n    size_at_300_ppi_mm: report.size_at_300_ppi_mm,\n\n    required_size_mm: report.required_size_mm,\n\n    effective_ppi: {\n      x: report.ppi_x,\n      y: report.ppi_y\n    },\n\n    image_orientation: report.orientation,\n    ratio_error_pct: report.ratio_error_pct,\n    errors: report.errors ?? []\n  };\n\n  // Build the final binary object in a consistent order\n  const orderedBinary = {};\n\n  for (const variant of REQUIRED_VARIANTS) {\n    orderedBinary[variant] = group.binary[variant];\n  }\n\n  results.push({\n    json: {\n      job_id: group.job_id,\n      file: group.file,\n\n      print_specification: printSpecification,\n\n      technical_validation: technicalValidation,\n\n      image_variants: REQUIRED_VARIANTS.map(\n        variant => group.variants[variant]\n      ),\n\n      analysis_context: {\n        images_are_from_same_source: true,\n        crop_coordinates_reference: 'original_image',\n        crop_pixel_scale: '1:1',\n        full_preview_is_resized: true,\n        maximum_variant_size_px: 768\n      }\n    },\n\n    binary: orderedBinary,\n\n    pairedItem: group.sourceIndices.map(\n      index => ({ item: index })\n    )\n  });\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        -16
+      ],
+      "id": "2c55b4a2-01ec-4fe5-ab70-19b39e6eb8f4",
+      "name": "Prepare AI input"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "gP1Mr6Srwn20ZlTb",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/gP1Mr6Srwn20ZlTb",
+          "cachedResultName": "Image check - Ai Validation"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2976,
+        -16
+      ],
+      "id": "00f5f1b4-d5b6-4e31-9f86-a54b923c9241",
+      "name": "Call 'Image check - Ai Validation'"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst inputs = $input.all();\n\nreturn inputs.map((item, i) => {\n\n  // Get the technical validation result\n  const report = item.json;\n\n  // Get the original print specification\n  const source = $('Split images').itemMatching(i).json;\n  const spec = source.spec?.data ??\n    source.data ??\n    source.spec ??\n    source;\n\n  // Separate image identification from technical results\n  const {\n    job_id,\n    file,\n    ...technicalData\n  } = report;\n\n  if (!job_id || !file) {\n    throw new Error('Missing job ID or filename');\n  }\n\n  return {\n    json: {\n      job_id,\n      file,\n\n      print_specification: {\n        trim_mm: spec.trim_mm,\n        orientation: spec.orientation,\n        bleed_mm: spec.bleed_mm,\n        min_ppi: spec.min_ppi\n      },\n\n      technical_validation: technicalData,\n\n      ai_validation: {\n        execution_status: 'SKIPPED',\n        reason: 'TECHNICAL_VALIDATION_FAILED'\n      }\n    },\n\n    pairedItem: { item: i }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        304
+      ],
+      "id": "c1f6bd74-dbde-48ea-8a32-a96c43bb0273",
+      "name": "FAIL report ready"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "format": true,
+          "encoding": "utf8",
+          "fileName": "={{ $json.file + '_report.json' }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        304
+      ],
+      "id": "5a29af8d-247e-492b-8548-e402530a0680",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1d8bc75-4ab8-44a2-b27f-482168cdd83c",
+              "name": "base_path",
+              "value": "C:/Image check - Ai/jobs",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -448,
+        0
+      ],
+      "id": "8fcd0d33-fa52-4ab6-afac-2d3efb6ee75e",
+      "name": "Config"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Config').item.json.base_path + '/' + $json.data.job_id + '/' + $json.file }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "5e4c2462-e3d1-45df-8014-986e412f2035",
+      "name": "Load images"
+    },
+    {
+      "parameters": {
+        "operation": "information"
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        0
+      ],
+      "id": "a5ba7b29-e50a-4758-954b-2f5a3a7bc26a",
+      "name": "Get metadata"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Config').item.json.base_path + '/' + $json.job_id + '/' + $json.file }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        -16
+      ],
+      "id": "4b575e56-576c-4232-b547-d4d0a1b3ac52",
+      "name": "Load images PASS"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst inputs = $input.all();\n\nconst OUTPUT_PPI = 300;\nconst RATIO_TOLERANCE = 0.5;\n\n// Round a number to the specified decimal places\nfunction round(value, decimals = 2) {\n  return Number(value.toFixed(decimals));\n}\n\n// Extract print specifications from the source item\nfunction getSpec(source) {\n  return source.spec?.data ?? source.data ?? source.spec ?? source;\n}\n\n// Extract the filename from the Split images node\nfunction getFileName(source) {\n  const fileName =\n    source.file ??\n    (typeof source.data?.files === 'string'\n      ? source.data.files\n      : null);\n\n  if (typeof fileName !== 'string' || !fileName.trim()) {\n    throw new Error('Missing image filename');\n  }\n\n  return fileName;\n}\n\n// Validate each image independently\nreturn inputs.map((item, i) => {\n\n  // Get the original specification associated with the image\n  const source = $('Split images').itemMatching(i).json;\n  const spec = getSpec(source);\n\n  const jobId = spec.job_id;\n  const fileName = getFileName(source);\n\n  // Get print requirements\n  const trimW = Number(spec.trim_mm?.width);\n  const trimH = Number(spec.trim_mm?.height);\n  const bleed = Number(spec.bleed_mm);\n  const minPPI = Number(spec.min_ppi);\n\n  // Get image dimensions in pixels\n  const image = item.json;\n\n  const rawWidth = image.size?.width ?? image.width;\n  const rawHeight = image.size?.height ?? image.height;\n\n  const width = rawWidth == null ? null : Number(rawWidth);\n  const height = rawHeight == null ? null : Number(rawHeight);\n\n  const errors = [];\n\n  let ppiX = null;\n  let ppiY = null;\n  let ratioError = null;\n  let targetW = null;\n  let targetH = null;\n  let orientation = null;\n\n  // Validate print specifications\n  const validSpec =\n    Number.isFinite(trimW) && trimW > 0 &&\n    Number.isFinite(trimH) && trimH > 0 &&\n    Number.isFinite(bleed) && bleed >= 0 &&\n    Number.isFinite(minPPI) && minPPI > 0;\n\n  if (!validSpec) {\n    errors.push('Invalid print specifications');\n  }\n\n  // Validate image dimensions\n  const validImage =\n    Number.isFinite(width) && width > 0 &&\n    Number.isFinite(height) && height > 0;\n\n  if (!validImage) {\n    errors.push('Invalid image dimensions');\n  }\n\n  // Calculate the physical image dimensions at 300 PPI\n  const sizeAt300PPI = {\n    width_mm: validImage\n      ? round(width * 25.4 / OUTPUT_PPI)\n      : null,\n    height_mm: validImage\n      ? round(height * 25.4 / OUTPUT_PPI)\n      : null\n  };\n\n  // Validate specification orientation\n  if (validSpec) {\n\n    const specOrientation =\n      trimW > trimH ? 'landscape' :\n      trimH > trimW ? 'portrait' : 'square';\n\n    if (spec.orientation !== specOrientation) {\n      errors.push(\n        'Specification orientation does not match trim dimensions'\n      );\n    }\n\n    // Calculate print dimensions including bleed\n    targetW = trimW + 2 * bleed;\n    targetH = trimH + 2 * bleed;\n  }\n\n  // Perform image validation\n  if (validSpec && validImage) {\n\n    // Calculate effective print resolution\n    ppiX = width * 25.4 / targetW;\n    ppiY = height * 25.4 / targetH;\n\n    // Calculate aspect ratio difference\n    ratioError = Math.abs(\n      (width / height) / (targetW / targetH) - 1\n    ) * 100;\n\n    // Determine image orientation\n    orientation =\n      width > height ? 'landscape' :\n      height > width ? 'portrait' : 'square';\n\n    // Calculate required pixel dimensions rounded to whole pixels\n    const requiredWidthPx = Math.round(targetW * minPPI / 25.4);\n    const requiredHeightPx = Math.round(targetH * minPPI / 25.4);\n    \n    // Check minimum resolution with pixel rounding tolerance\n    if (width < requiredWidthPx || height < requiredHeightPx) {\n      errors.push('Insufficient image resolution');\n    }\n\n    // Check aspect ratio\n    if (ratioError > RATIO_TOLERANCE) {\n      errors.push('Incorrect image aspect ratio');\n    }\n\n    // Check image orientation\n    if (orientation !== spec.orientation) {\n      errors.push('Incorrect image orientation');\n    }\n  }\n\n  // Return an independent report for each image\n  return {\n    json: {\n      job_id: jobId,\n      file: fileName,\n      status: errors.length === 0 ? 'PASS' : 'FAIL',\n\n      width_px: validImage ? width : null,\n      height_px: validImage ? height : null,\n\n      size_at_300_ppi_mm: sizeAt300PPI,\n\n      required_size_mm: {\n        width: targetW,\n        height: targetH\n      },\n\n      min_ppi: validSpec ? minPPI : null,\n\n      ppi_x: ppiX === null ? null : round(ppiX, 1),\n      ppi_y: ppiY === null ? null : round(ppiY, 1),\n\n      orientation,\n\n      ratio_error_pct: ratioError === null\n        ? null\n        : round(ratioError),\n\n      errors\n    },\n\n    // Preserve the connection to the original image item\n    pairedItem: { item: i }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        0
+      ],
+      "id": "5ebd2aec-d069-48a7-8b55-ac4b08abbd5c",
+      "name": "Check specification"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\n\nconst MAX_CROP_SIZE = 768;\nconst MAX_PREVIEW_SIDE = 768;\n\nconst CROP_POSITIONS = [\n  {\n    name: 'upper_left',\n    xFactor: 0.15,\n    yFactor: 0.15\n  },\n  {\n    name: 'center_right',\n    xFactor: 0.65,\n    yFactor: 0.50\n  },\n  {\n    name: 'bottom_left',\n    xFactor: 0.15,\n    yFactor: 0.65\n  }\n];\n\nconst results = [];\n\nfor (let i = 0; i < inputs.length; i++) {\n  const item = inputs[i];\n\n  // Get the original validation report from the IF node\n  const image = $('IF - PASS').itemMatching(i).json;\n\n  if (image.status !== 'PASS') {\n    continue;\n  }\n\n  const width = Number(image.width_px);\n  const height = Number(image.height_px);\n\n  if (\n    !Number.isFinite(width) ||\n    !Number.isFinite(height) ||\n    width <= 0 ||\n    height <= 0\n  ) {\n    throw new Error(`Invalid image dimensions: ${image.file}`);\n  }\n\n  if (!item.binary?.data) {\n    throw new Error(`Missing binary data for file: ${image.file}`);\n  }\n\n  // Crop size must never exceed 768 px\n  const cropSize = Math.min(\n    MAX_CROP_SIZE,\n    Math.floor(width),\n    Math.floor(height)\n  );\n\n  const freeX = width - cropSize;\n  const freeY = height - cropSize;\n\n  // Generate 3 crop tasks\n  for (const position of CROP_POSITIONS) {\n    const cropX = Math.round(freeX * position.xFactor);\n    const cropY = Math.round(freeY * position.yFactor);\n\n    results.push({\n      json: {\n        ...image,\n        operation_type: 'crop',\n        variant_name: position.name,\n        crop_x: cropX,\n        crop_y: cropY,\n        crop_width: cropSize,\n        crop_height: cropSize\n      },\n      binary: item.binary,\n      pairedItem: { item: i }\n    });\n  }\n\n  // Generate 1 full preview resize task\n  let resizeWidth;\n  let resizeHeight;\n\n  if (width >= height) {\n    resizeWidth = MAX_PREVIEW_SIDE;\n    resizeHeight = Math.round(height * MAX_PREVIEW_SIDE / width);\n  } else {\n    resizeHeight = MAX_PREVIEW_SIDE;\n    resizeWidth = Math.round(width * MAX_PREVIEW_SIDE / height);\n  }\n\n  results.push({\n    json: {\n      ...image,\n      operation_type: 'resize',\n      variant_name: 'full_preview',\n      resize_width: resizeWidth,\n      resize_height: resizeHeight\n    },\n    binary: item.binary,\n    pairedItem: { item: i }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        -16
+      ],
+      "id": "14edaf0f-37c8-4a16-ba7e-8fae125b75f1",
+      "name": "Coordinates for crop"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Config').item.json.base_path + '/' + $('FAIL report ready').item.json.job_id + '/' + $binary.data.fileName }}",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        2208,
+        304
+      ],
+      "id": "8a211b5e-e041-41ff-8db1-422d30e4200a",
+      "name": "Save report"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "format": true,
+          "encoding": "utf8",
+          "fileName": "={{ $json.file + '_report.json' }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3168,
+        -16
+      ],
+      "id": "8d331bc0-53e1-4480-8139-d24ac1129304",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Config').item.json.base_path + '/' + $('Call \\'Image check - Ai Validation\\'').item.json.job_id + '/' + $binary.data.fileName }}",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        3344,
+        -16
+      ],
+      "id": "f38fb76e-768f-4356-85a0-1611a4660f23",
+      "name": "Save AI report"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3712,
+        144
+      ],
+      "id": "d590fd8f-b301-4bab-b696-f9a39dafd518",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c202bd40-8556-4474-81e5-c3d1acd4e16b",
+              "name": "job_id",
+              "value": "={{ $('FAIL report ready').item.json.job_id }}",
+              "type": "string"
+            },
+            {
+              "id": "3cde7b01-1c8c-474d-a2ee-e189932a11f5",
+              "name": "file",
+              "value": "={{ $('FAIL report ready').item.json.file }}",
+              "type": "string"
+            },
+            {
+              "id": "ab15ba9a-7933-4f9a-bc11-34da0e66a876",
+              "name": "status",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "d885f87e-0a54-4601-97c4-064cd1a59c0c",
+              "name": "analysis_ok",
+              "value": "={{ true }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2384,
+        304
+      ],
+      "id": "ca045d68-9227-44b4-80d4-74d1d88c6731",
+      "name": "FAIL saved"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c202bd40-8556-4474-81e5-c3d1acd4e16b",
+              "name": "job_id",
+              "value": "={{ $('Call \\'Image check - Ai Validation\\'').item.json.job_id }}",
+              "type": "string"
+            },
+            {
+              "id": "3cde7b01-1c8c-474d-a2ee-e189932a11f5",
+              "name": "file",
+              "value": "={{ $('Call \\'Image check - Ai Validation\\'').item.json.file }}",
+              "type": "string"
+            },
+            {
+              "id": "ab15ba9a-7933-4f9a-bc11-34da0e66a876",
+              "name": "status",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "ab260d14-2b89-4a40-b71c-dc6a956d512a",
+              "name": "analysis_ok",
+              "value": "={{ $('Call \\'Image check - Ai Validation\\'').item.json.ai_validation?.execution_status === 'COMPLETED'  }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        3520,
+        -16
+      ],
+      "id": "f8ea13ca-d364-4aab-b40b-a07ac6d7d95c",
+      "name": "AI saved"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst expectedJobs = new Map();\nconst savedJobs = new Map();\n\n// Collect expected files from the original specification\nfor (const item of $('Split images').all()) {\n  const source = item.json;\n  const spec = source.data ?? source.spec?.data ?? source.spec ?? source;\n\n  const jobId = spec.job_id;\n  const file = source.file;\n\n  if (!jobId || typeof file !== 'string' || !file) {\n    throw new Error('Missing job_id or filename in Split images');\n  }\n\n  if (!expectedJobs.has(jobId)) {\n    expectedJobs.set(jobId, new Set());\n  }\n\n  expectedJobs.get(jobId).add(file);\n}\n\n// Collect report confirmations from Merge\nfor (const item of $input.all()) {\n  const report = item.json;\n\n  if (!savedJobs.has(report.job_id)) {\n    savedJobs.set(report.job_id, []);\n  }\n\n  savedJobs.get(report.job_id).push(report);\n}\n\nconst results = [];\n\n// Check each job independently\nfor (const [jobId, expectedFiles] of expectedJobs) {\n  const reports = savedJobs.get(jobId) ?? [];\n  const savedFiles = new Set();\n\n  const failedFiles = [];\n\n  for (const report of reports) {\n    if (report.status === true) {\n      savedFiles.add(report.file);\n    }\n\n    if (report.status !== true || report.analysis_ok !== true) {\n      failedFiles.push(report.file);\n    }\n  }\n\n  const missingFiles = [...expectedFiles].filter(\n    file => !savedFiles.has(file)\n  );\n\n  const unexpectedFiles = [...savedFiles].filter(\n    file => !expectedFiles.has(file)\n  );\n\n  const duplicateFiles = [...new Set(\n    reports\n      .map(report => report.file)\n      .filter((file, index, files) => files.indexOf(file) !== index)\n  )];\n\n  const completed =\n    expectedFiles.size > 0 &&\n    missingFiles.length === 0 &&\n    unexpectedFiles.length === 0 &&\n    duplicateFiles.length === 0 &&\n    failedFiles.length === 0;\n\n  results.push({\n    json: {\n      job_id: jobId,\n      status: completed ? 'COMPLETED' : 'ERROR',\n      expected_reports: expectedFiles.size,\n      saved_reports: savedFiles.size,\n      missing_files: missingFiles,\n      failed_files: failedFiles,\n      unexpected_files: unexpectedFiles,\n      duplicate_files: duplicateFiles,\n      checked_at: new Date().toISOString()\n    }\n  });\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3904,
+        144
+      ],
+      "id": "b79a826c-7bd4-4add-9d5f-570ba2e2d45e",
+      "name": "Check job completion"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "jobs",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job_id": "={{ $('Extract from File').item.json.data.job_id }}",
+            "status": "PROCESSING"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "checked_at",
+              "displayName": "checked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        112
+      ],
+      "id": "4dce6b7e-78d5-4844-b6e2-47acbea6721c",
+      "name": "Processing",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "jobs",
+          "mode": "name"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "job_id",
+              "keyValue": "={{ $json.job_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "checked_at": "={{ $json.checked_at }}",
+            "status": "={{ $json.status }}",
+            "job_id": "={{ $json.job_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "checked_at",
+              "displayName": "checked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "report_path",
+              "displayName": "report_path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4080,
+        144
+      ],
+      "id": "b13f834a-d8c4-4583-8d0f-32ea218be645",
+      "name": "Completed"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        688,
+        0
+      ],
+      "id": "e9210e0f-7f8a-4c82-80ec-85e8d541e6ac",
+      "name": "Merge2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a data table": {
+      "main": [
+        [
+          {
+            "node": "Specification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "If row does not exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If row does not exist": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Specification": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split images": {
+      "main": [
+        [
+          {
+            "node": "Load images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - PASS": {
+      "main": [
+        [
+          {
+            "node": "Load images PASS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL report ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Crop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crop": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI input": {
+      "main": [
+        [
+          {
+            "node": "Call 'Image check - Ai Validation'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAIL report ready": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Save report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Create a data table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load images": {
+      "main": [
+        [
+          {
+            "node": "Get metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get metadata": {
+      "main": [
+        [
+          {
+            "node": "Check specification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load images PASS": {
+      "main": [
+        [
+          {
+            "node": "Coordinates for crop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check specification": {
+      "main": [
+        [
+          {
+            "node": "IF - PASS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coordinates for crop": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Image check - Ai Validation'": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Save AI report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save AI report": {
+      "main": [
+        [
+          {
+            "node": "AI saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save report": {
+      "main": [
+        [
+          {
+            "node": "FAIL saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAIL saved": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI saved": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Check job completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check job completion": {
+      "main": [
+        [
+          {
+            "node": "Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processing": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Split images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1c6cfd95-134b-466d-8f8b-c4fe7446d5d4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6d4a63c81052655cc0ead07250dcac6a7f412c08d464fcb6eb5e10aba8a436e0"
+  },
+  "nodeGroups": [],
+  "id": "JlEdWWRaluB67Nf4",
+  "tags": []
+}

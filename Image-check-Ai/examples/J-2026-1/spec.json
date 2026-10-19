@@ -1,0 +1,14 @@
+
+{
+  "job_id": "J-2026-1",
+  "trim_mm": {
+    "width": 210,
+    "height": 297
+  },
+  "orientation": "portrait",
+  "bleed_mm": 3,
+  "min_ppi": 300,
+  "files": [
+    "florist.png"
+  ]
+}
