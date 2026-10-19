@@ -57,7 +57,7 @@ The automation consists of **two separate n8n workflows**. **Both must be import
 
 ![Main n8n workflow — Image check - Ai](./screenshots/main-workflow.png)
 
-*Screenshot: complete main n8n workflow (add `screenshots/main-workflow.png`).*
+*Screenshot: complete main n8n workflow.*
 
 The main workflow manages files, technical validation, report generation, and job tracking.
 
@@ -81,7 +81,7 @@ The main workflow handles **multiple images and multiple job IDs** and keeps eac
 
 ![AI validation sub-workflow — Image check - Ai](./screenshots/ai-validation-subworkflow.png)
 
-*Screenshot: Gemini analysis and response validation sub-workflow (add `screenshots/ai-validation-subworkflow.png`).*
+*Screenshot: Gemini analysis and response validation sub-workflow.*
 
 The sub-workflow performs the AI request and verifies the returned data. It is called by the main workflow for images that have passed technical preflight.
 
