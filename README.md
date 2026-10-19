@@ -29,6 +29,7 @@ The table below lists the currently developed projects. Since each tool may rely
 | :--- | :--- | :--- |
 | **Acrobat Droplet & Hot Folder** | [📁 `/HotFolder-Acrobat`](./HotFolder-Acrobat) | A PowerShell script automating preflight checks. PDFs dropped into the Hot Folder are automatically processed and verified using Adobe Acrobat Pro droplets. |
 | **Batch Square Crop Skill** | [📁 `/Batch-square-crop`](./Batch-square-crop) | A Gemini CLI skill that uses AI vision to automatically detect, center, and crop images into perfect squares for production-ready assets. |
+| **Image check - Ai** | [📁 ](https://github.com/KonradJam/DTP-Print-Production-Solutions/blob/main/Image-check-Ai)[`/Image-check-Ai`](https://github.com/KonradJam/DTP-Print-Production-Solutions/blob/main/Image-check-Ai) | An experimental n8n workflow for verifying print-ready image specifications and testing whether publicly available AI models can be used to evaluate raster image quality in DTP production. |
 
 > **Best Practice Tip:** Navigate to the specific solution's folder and read its local `README.md` to learn how to deploy the tool in your specific work environment.
 
